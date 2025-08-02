@@ -1,5 +1,5 @@
 # GPU-Optimized Dockerfile for AI Image Generator
-FROM python:3.10-slim
+FROM nvidia/cuda:12.1.1-cudnn8-runtime-ubuntu22.04
 
 WORKDIR /app
 
@@ -29,12 +29,13 @@ RUN apt-get update && apt-get install -y \
 # Copy and install requirements
 COPY requirements.txt .
 
-# Install PyTorch with CUDA support
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-# Install other requirements
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python and pip
+RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
+RUN pip3 install --no-cache-dir --upgrade pip
+
+# Install all requirements (including torch/torchvision/torchaudio)
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy application
 COPY app.py .
@@ -46,4 +47,4 @@ RUN mkdir -p /app/cache /root/.cache/huggingface
 EXPOSE 7860
 
 # Run application with verbose output
-CMD ["python", "-u", "app.py"]
+CMD ["python3", "-u", "app.py"]

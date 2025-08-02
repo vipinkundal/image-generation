@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  ai-image-generator-gpu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "7860:7860"
+    volumes:
+      - model_cache:/app/cache
+      - huggingface_cache:/root/.cache/huggingface
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - NVIDIA_VISIBLE_DEVICES=all
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+    restart: unless-stopped
+    runtime: nvidia
+
+volumes:
+  model_cache:
+    driver: local
+  huggingface_cache:
+    driver: local

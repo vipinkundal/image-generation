@@ -227,7 +227,7 @@ def load_cpu_pipeline():
             return False
     return True
 
-def generate_image(prompt, device_choice, num_inference_steps, guidance_scale):
+def generate_image(prompt, device_choice, num_inference_steps, guidance_scale, width, height):
     """Generate image using selected device"""
     
     if not prompt.strip():
@@ -260,8 +260,8 @@ def generate_image(prompt, device_choice, num_inference_steps, guidance_scale):
                         prompt,
                         num_inference_steps=num_inference_steps,
                         guidance_scale=guidance_scale,
-                        height=512,
-                        width=512,
+                        height=height,
+                        width=width,
                         generator=torch.Generator(device="cuda").manual_seed(42)  # Consistent results
                     ).images[0]
                 device_used = "GPU"
@@ -282,8 +282,8 @@ def generate_image(prompt, device_choice, num_inference_steps, guidance_scale):
                 prompt,
                 num_inference_steps=num_inference_steps,
                 guidance_scale=guidance_scale,
-                height=512,
-                width=512,
+                height=height,
+                width=width,
                 generator=torch.Generator().manual_seed(42)  # Consistent results
             ).images[0]
             device_used = "CPU"
@@ -346,6 +346,20 @@ def create_interface():
                         label="Guidance Scale"
                     )
                 
+                width_slider = gr.Slider(
+                    minimum=256,
+                    maximum=2048,
+                    value=512,
+                    step=64,
+                    label="Width (px)"
+                )
+                height_slider = gr.Slider(
+                    minimum=256,
+                    maximum=2048,
+                    value=512,
+                    step=64,
+                    label="Height (px)"
+                )
                 generate_btn = gr.Button("🎨 Generate Image", variant="primary", size="lg")
                 
             with gr.Column(scale=1):
@@ -366,7 +380,7 @@ def create_interface():
         # Connect the generate button
         generate_btn.click(
             fn=generate_image,
-            inputs=[prompt_input, device_choice, steps_slider, guidance_slider],
+            inputs=[prompt_input, device_choice, steps_slider, guidance_slider, width_slider, height_slider],
             outputs=[output_image, status_text]
         )
     

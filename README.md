@@ -53,7 +53,7 @@ Both versions will be available at:
 ```bash
 cd gpu-version
 docker build -t ai-image-gpu .
-docker run --rm -p 7860:7860 ai-image-gpu
+docker run --gpus all --rm -p 7860:7860 ai-image-gpu
 ```
 
 ### CPU Version
